@@ -7,8 +7,10 @@ import fastify, {
   LightMyRequestChain,
   LightMyRequestResponse,
   LightMyRequestCallback,
-  InjectOptions, FastifyBaseLogger
+  InjectOptions, FastifyBaseLogger,
+  ValidationResult
 } from '../../fastify'
+import { ErrorObject as AjvErrorObject } from 'ajv'
 import * as http from 'http'
 import * as https from 'https'
 import * as http2 from 'http2'
@@ -119,6 +121,7 @@ expectAssignable<FastifyInstance<http.Server, http.IncomingMessage, http.ServerR
 expectAssignable<FastifyInstance>(fastify({ serverFactory: () => http.createServer() }))
 expectAssignable<FastifyInstance>(fastify({ caseSensitive: true }))
 expectAssignable<FastifyInstance>(fastify({ requestIdHeader: 'request-id' }))
+expectAssignable<FastifyInstance>(fastify({ requestIdHeader: false }))
 expectAssignable<FastifyInstance>(fastify({ genReqId: () => 'request-id' }))
 expectAssignable<FastifyInstance>(fastify({ trustProxy: true }))
 expectAssignable<FastifyInstance>(fastify({ querystringParser: () => ({ foo: 'bar' }) }))
@@ -192,7 +195,18 @@ expectAssignable<FastifyInstance>(fastify({ frameworkErrors: () => { } }))
 expectAssignable<FastifyInstance>(fastify({
   rewriteUrl: (req) => req.url === '/hi' ? '/hello' : req.url!
 }))
-expectAssignable<FastifyInstance>(fastify({ schemaErrorFormatter: (errors, dataVar) => new Error() }))
+expectAssignable<FastifyInstance>(fastify({
+  schemaErrorFormatter: (errors, dataVar) => {
+    console.log(
+      errors[0].keyword.toLowerCase(),
+      errors[0].message?.toLowerCase(),
+      errors[0].params,
+      errors[0].instancePath.toLowerCase(),
+      errors[0].schemaPath.toLowerCase()
+    )
+    return new Error()
+  }
+}))
 expectAssignable<FastifyInstance>(fastify({
   clientErrorHandler: (err, socket) => {
     expectType<ConnectionError>(err)
@@ -208,3 +222,12 @@ fastify().then(fastifyInstance => expectAssignable<FastifyInstance>(fastifyInsta
 expectAssignable<FastifyPluginAsync>(async () => {})
 expectAssignable<FastifyPluginCallback>(() => {})
 expectAssignable<FastifyPlugin>(() => {})
+
+const ajvErrorObject: AjvErrorObject = {
+  keyword: '',
+  instancePath: '',
+  schemaPath: '',
+  params: {},
+  message: ''
+}
+expectAssignable<ValidationResult>(ajvErrorObject)

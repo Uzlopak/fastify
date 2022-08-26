@@ -38,7 +38,7 @@ export interface FastifyReply<
   send(payload?: ReplyType): FastifyReply<RawServer, RawRequest, RawReply, RouteGeneric, ContextConfig, SchemaCompiler, TypeProvider>;
   header(key: string, value: any): FastifyReply<RawServer, RawRequest, RawReply, RouteGeneric, ContextConfig, SchemaCompiler, TypeProvider>;
   headers(values: {[key: string]: any}): FastifyReply<RawServer, RawRequest, RawReply, RouteGeneric, ContextConfig, SchemaCompiler, TypeProvider>;
-  getHeader(key: string): string | undefined;
+  getHeader(key: string): number | string | string[] | undefined;
   getHeaders(): {
     // Node's `getHeaders()` can return numbers and arrays, so they're included here as possible types.
     [key: string]: number | string | string[] | undefined;
@@ -54,5 +54,11 @@ export interface FastifyReply<
   type(contentType: string): FastifyReply<RawServer, RawRequest, RawReply, RouteGeneric, ContextConfig, SchemaCompiler, TypeProvider>;
   serializer(fn: (payload: any) => string): FastifyReply<RawServer, RawRequest, RawReply, RouteGeneric, ContextConfig, SchemaCompiler, TypeProvider>;
   serialize(payload: any): string | ArrayBuffer | Buffer;
+  // Serialization Methods
+  getSerializationFunction(httpStatus: string): (payload: {[key: string]: unknown}) => string;
+  getSerializationFunction(schema: {[key: string]: unknown}): (payload: {[key: string]: unknown}) => string;
+  compileSerializationSchema(schema: {[key: string]: unknown}, httpStatus?: string): (payload: {[key: string]: unknown}) => string;
+  serializeInput(input: {[key: string]: unknown}, schema: {[key: string]: unknown}, httpStatus?: string): string;
+  serializeInput(input: {[key: string]: unknown}, httpStatus: string): unknown;
   then(fulfilled: () => void, rejected: (err: Error) => void): void;
 }

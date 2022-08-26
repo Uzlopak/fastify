@@ -123,7 +123,7 @@ export type FastifyServerOptions<
   serializerOpts?: FJSOptions | Record<string, unknown>,
   serverFactory?: FastifyServerFactory<RawServer>,
   caseSensitive?: boolean,
-  requestIdHeader?: string,
+  requestIdHeader?: string | false,
   requestIdLogLabel?: string;
   jsonShorthand?: boolean;
   genReqId?: <RequestGeneric extends RequestGenericInterface = RequestGenericInterface, TypeProvider extends FastifyTypeProvider = FastifyTypeProviderDefault>(req: FastifyRequest<RequestGeneric, RawServer, RawRequestDefaultExpression<RawServer>, FastifySchema, TypeProvider>) => string,
@@ -183,10 +183,10 @@ declare module '@fastify/error' {
 
 export interface ValidationResult {
   keyword: string;
-  dataPath: string;
+  instancePath: string;
   schemaPath: string;
   params: Record<string, string | string[]>;
-  message: string;
+  message?: string;
 }
 
 /* Export all additional types */
@@ -194,7 +194,7 @@ export type { Chain as LightMyRequestChain, InjectOptions, Response as LightMyRe
 export { FastifyRequest, RequestGenericInterface } from './types/request'
 export { FastifyReply } from './types/reply'
 export { FastifyPluginCallback, FastifyPluginAsync, FastifyPluginOptions, FastifyPlugin } from './types/plugin'
-export { FastifyInstance, PrintRoutesOptions } from './types/instance'
+export { FastifyListenOptions, FastifyInstance, PrintRoutesOptions } from './types/instance'
 export { FastifyLoggerOptions, FastifyBaseLogger, FastifyLoggerInstance, FastifyLogFn, LogLevel } from './types/logger'
 export { FastifyContext, FastifyContextConfig } from './types/context'
 export { RouteHandler, RouteHandlerMethod, RouteOptions, RouteShorthandMethod, RouteShorthandOptions, RouteShorthandOptionsWithHandler } from './types/route'

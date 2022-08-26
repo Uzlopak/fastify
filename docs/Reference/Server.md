@@ -55,7 +55,7 @@ describes the properties available in that options object.
     - [routing](#routing)
     - [route](#route)
     - [close](#close)
-    - [decorate\*](#decorate)
+    - [decorate*](#decorate)
     - [register](#register)
     - [addHook](#addhook)
     - [prefix](#prefix)
@@ -488,11 +488,18 @@ about safe regexp: [Safe-regex2](https://www.npmjs.com/package/safe-regex2)
 ### `requestIdHeader`
 <a id="factory-request-id-header"></a>
 
-The header name used to know the request-id. See [the
+The header name used to set the request-id. See [the
 request-id](./Logging.md#logging-request-id) section.
+Setting `requestIdHeader` to `false` will always use [genReqId](#genreqid)
 
 + Default: `'request-id'`
-
+  
+```js
+const fastify = require('fastify')({
+  requestIdHeader: 'x-custom-id', // -> use 'X-Custom-Id' header if available
+  //requestIdHeader: false, // -> always use genReqId
+})
+```
 ### `requestIdLogLabel`
 <a id="factory-request-id-log-label"></a>
 
@@ -890,7 +897,7 @@ fastify.ready().then(() => {
 Starts the server and internally waits for the `.ready()` event. The signature
 is `.listen([options][, callback])`. Both the `options` object and the
 `callback` parameters follow the [Node.js
-core][https://nodejs.org/api/net.html#serverlistenoptions-callback] parameter
+core](https://nodejs.org/api/net.html#serverlistenoptions-callback) parameter
 definitions.
 
 By default, the server will listen on the address(es) resolved by `localhost`
@@ -1112,12 +1119,15 @@ fastify.register(function (instance, opts, done) {
 <a id="pluginName"></a>
 
 Name of the current plugin. The root plugin is called `'fastify'`. There are
-three ways to define a name (in order).
+different ways to define a name (in order).
 
 1. If you use [fastify-plugin](https://github.com/fastify/fastify-plugin) the
    metadata `name` is used.
-2. If you `module.exports` a plugin the filename is used.
-3. If you use a regular [function
+2. If the exported plugin has the `Symbol.for('fastify.display-name')` property,
+   then the value of that property is used.
+   Example: `pluginFn[Symbol.for('fastify.display-name')] = "Custom Name"`
+3. If you `module.exports` a plugin the filename is used.
+4. If you use a regular [function
    declaration](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#Defining_functions)
    the function name is used.
 
@@ -1401,6 +1411,9 @@ handlers. *async-await* is supported as well.
 
 *Note: If the error `statusCode` is less than 400, Fastify will automatically
 set it at 500 before calling the error handler.*
+
+*Also note* that `setErrorHandler` will ***not*** catch any error inside
+an `onResponse` hook because the response has already been sent to the client.
 
 ```js
 fastify.setErrorHandler(function (error, request, reply) {

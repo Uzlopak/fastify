@@ -32,8 +32,10 @@ fastify.route(options)
 ### Routes options
 <a id="options"></a>
 
-*`method`: currently it supports `'DELETE'`, `'GET'`, `'HEAD'`, `'PATCH'`,
-  `'POST'`, `'PUT'` and `'OPTIONS'`. It could also be an array of methods.
+* `method`: currently it supports `'DELETE'`, `'GET'`, `'HEAD'`, `'PATCH'`,
+  `'POST'`, `'PUT'`, `'OPTIONS'`, `'SEARCH'`, `'TRACE'`, `'PROPFIND'`,
+  `'PROPPATCH'`, `'MKCOL'`, `'COPY'`, `'MOVE'`, `'LOCK'`  and `'UNLOCK'`.
+  It could also be an array of methods.
 * `url`: the path of the URL to match this route (alias: `path`).
 * `schema`: an object containing the schemas for the request and response. They
   need to be in [JSON Schema](https://json-schema.org/) format, check
@@ -656,7 +658,7 @@ fastify.inject({
 >
 > ```js
 > const append = require('vary').append
-> fastify.addHook('onSend', async (req, reply) => {
+> fastify.addHook('onSend', (req, reply, payload, done) => {
 >   if (req.headers['accept-version']) { // or the custom header you are using
 >     let value = reply.getHeader('Vary') || ''
 >     const header = Array.isArray(value) ? value.join(', ') : String(value)
@@ -664,6 +666,7 @@ fastify.inject({
 >       reply.header('Vary', value)
 >     }
 >   }
+>  done()
 > })
 > ```
 
